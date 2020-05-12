@@ -33,8 +33,14 @@ int main(int argc, char* argv[])
 
     //subscribe to MasterMsg topic
     ros::Subscriber sub = nh_TcpProcess.subscribe("MasterMsg", 1000, MasterMsgCallback);
+    
+    //Message to publish M commands on
+    ros::Publisher MCommandMsg_pub = nh_TcpProcess.advertise<std_msgs::String>("MCommandMsg", 1000);
+    
+    //create message object to put data in and forward on MCommand topic
+    std_msgs::String MCommandmsg;
 
-    while(ros::ok)
+    while(ros::ok())
     {
         if(count >= 1)
         {
@@ -45,30 +51,35 @@ int main(int argc, char* argv[])
             switch(message[0])
             {
                 case 'M':
-                    ROS_INFO("I got a move command");
+                    ROS_INFO("TcpProcess_node: I got a move command");
                     switch(message[1])
                     {
                         case '1':
-                            ROS_INFO("Move to M1");
+                            ROS_INFO("TcpProcess_node: Move to M1");
+                            MCommandmsg.data = "M1";
                             break;
                         case '2':
-                            ROS_INFO("Move to M2");
+                            ROS_INFO("TcpProcess_node: Move to M2");
+                            MCommandmsg.data = "M2";
                             break;
                         case '3':
-                            ROS_INFO("Move to M3");
+                            ROS_INFO("TcpProcess_node: Move to M3");
+                            MCommandmsg.data = "M3";
                             break;
                         default:
-                            ROS_INFO("Unknown move command");
+                            ROS_INFO("TcpProcess_node: Unknown move command");
+                            MCommandmsg.data = "Unknown Move Command";
                             break;
-                    }                    
+                    }
+                    MCommandMsg_pub.publish(MCommandmsg);                    
                     break;
                 case 'R':
-                    ROS_INFO("I got a Report command");
+                    ROS_INFO("TcpProcess_node: I got a Report command");
                     break;
                 default:
-                    ROS_INFO("???????"); 
+                    ROS_INFO("TcpProcess_node: ???????"); 
                     break;
-            }    
+            }
             count--;
         }
         ros::spinOnce();

@@ -10,6 +10,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <netinet/in.h>
+#include <fcntl.h>
 
 #define BUFFSIZE 1500
 
@@ -40,6 +41,7 @@ int main(int argc, char* argv[])
         Die("Failed to create socket");
     }
 
+
     //Construct the server sockaddr_in structure
     memset(&echoserver, 0, sizeof(echoserver));
     echoserver.sin_family = AF_INET;
@@ -53,30 +55,33 @@ int main(int argc, char* argv[])
         Die("Failed to connect with server");
     }
 
+    fcntl(sock, F_SETFL, O_NONBLOCK);
+
     //Recieve data onver TCP then forward data to TcpProcess_node
     // on MasterMsg topic
-    while(1)
+    while(ros::ok())
     {
         int bytes = 0;
-        if((bytes = recv(sock, buffer, BUFFSIZE-1, 0)) < 1)
+        if((bytes = recv(sock, buffer, BUFFSIZE-1, 0)) >= 1)
         {
-            Die("Failed to receive bytes from server");
+            ROS_INFO("%d", bytes);
+            received += bytes;
+            buffer[bytes] = '\0';
+            fprintf(stdout, buffer);
+            send(sock, "got message", strlen("got message"), 0);
+
+            //create message object to put data in and forward on MasterMsg topic
+            std_msgs::String msg;
+
+            // std::stringstream ss;
+            // ss<< "Hello Topic " << count;
+            msg.data = buffer;//ss.str();
+
+            TcpMsg_pub.publish(msg);
+
+            ROS_INFO("%s", msg.data.c_str());
         }
-        received += bytes;
-        buffer[bytes] = '\0';
-        fprintf(stdout, buffer);
-        send(sock, "got message", strlen("got message"), 0);
 
-        //create message object to put data in and forward on MasterMsg topic
-        std_msgs::String msg;
-
-        // std::stringstream ss;
-        // ss<< "Hello Topic " << count;
-        msg.data = buffer;//ss.str();
-
-        TcpMsg_pub.publish(msg);
-
-        ROS_INFO("%s", msg.data.c_str());
         ros::spinOnce();
     }
 
