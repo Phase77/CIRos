@@ -55,6 +55,7 @@ int main(int argc, char* argv[])
         Die("Failed to connect with server");
     }
 
+    //Add recieve timeout
     fcntl(sock, F_SETFL, O_NONBLOCK);
 
     //Recieve data onver TCP then forward data to TcpProcess_node
@@ -64,7 +65,6 @@ int main(int argc, char* argv[])
         int bytes = 0;
         if((bytes = recv(sock, buffer, BUFFSIZE-1, 0)) >= 1)
         {
-            ROS_INFO("%d", bytes);
             received += bytes;
             buffer[bytes] = '\0';
             fprintf(stdout, buffer);

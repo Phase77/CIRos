@@ -165,8 +165,6 @@ int main(int argc, char* argv[])
   target_pose_M1.position.y = 0.3;
   target_pose_M1.position.z = 1.5;
 
-  // geometry_msgs::Pose
-
   //Joint positions for M2. Radians
   target_pose_M2.orientation.w = 1.0;
   target_pose_M2.orientation.x = 1.0;
