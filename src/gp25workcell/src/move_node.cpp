@@ -172,7 +172,7 @@ int main(int argc, char* argv[])
   target_pose_M2.orientation.z = 1.0;
   target_pose_M2.position.x = 1.0;
   target_pose_M2.position.y = 0.3;
-  target_pose_M2.position.z = 1.5;
+  target_pose_M2.position.z = 1.1;
 
   //Joint positions for M3. Radians
   target_pose_M3.orientation.w = 0.5;
